@@ -1,0 +1,133 @@
+﻿<!DOCTYPE html>
+<html lang="zh-hans">
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link type="image/x-icon" rel="shortcut icon" href="~/Images/icon/title.ico" />
+    <title>@ViewBag.Title</title>
+    <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <script src="~/Scripts/layer.js"></script>
+    <script src="~/Scripts/Controls.js"></script>
+    <style>
+        body {
+            padding-top: 50px;
+        }
+
+        .item img {
+            width: 100%;
+        }
+
+        .navbar-inverse input[type="text"] {
+            background: #313131;
+            border: none;
+            color: #999;
+        }
+
+        .navbar-inverse .navbar-form {
+            position: relative;
+        }
+
+        .navbar-inverse button[type="button"] {
+            position: absolute;
+            top: 30%;
+            right: 20px;
+            background: none;
+            border: none;
+        }
+
+        @@media(min-width:768px) {
+            .navbar-inverse button[type="submit"] {
+                top: 15%;
+            }
+        }
+
+        .navbar-inverse .glyphicon {
+            color: #999;
+        }
+
+        .profile {
+            margin-right: 25px;
+        }
+
+        #copyright {
+            background-color: #202020;
+            height: 100px;
+            color: #524f4f;
+            text-align: center;
+            font-size: 10px;
+            padding-top: 6px;
+        }
+    </style>
+    @RenderSection("script", false)
+    @RenderSection("css", false)
+</head>
+<body>
+    <!--------------------------------- 导航开始 ------------------------------------->
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+        <div class="container">
+            <!-- 导航头 -->
+            <div class="navbar-header">
+                <button class="navbar-toggle" data-toggle="collapse" data-target="#myheader">
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a href="#" class="navbar-brand"><strong>华仔</strong></a>
+            </div>
+            <!-- 主题内容 -->
+            <div class="collapse navbar-collapse" id="myheader">
+                <ul class="nav navbar-nav">
+                    <li><a href="/Home/Index">首页</a></li>
+                    <li  class="active"><a href="/Content/Blog">博客</a></li>
+                    <li><a href="/Content/Atricle">文章</a></li>
+                </ul>
+                <!-- 内嵌表单 -->
+                <form action="" class="navbar-form navbar-left">
+                    <input type="text" placeholder="搜索" class="form-control" />
+                    <button type="button">
+                        <span class="glyphicon glyphicon-search"></span>
+                    </button>
+                </form>
+                <!-- 内嵌连接 -->
+                <a href="#" class="btn btn-primary btn-sm navbar-btn navbar-right hidden-xs">订阅消息</a>
+                <!-- 用户按钮 -->
+                <div class="profile navbar-right">
+                    <ul class="nav navbar-nav">
+                        <li><a href="#" data-target="#login-modal" data-toggle="modal"><span class="glyphicon glyphicon-user"></span> 登录</a></li>
+                        <li><a href="#" data-target="#regist-modal" data-toggle="modal"><span class="glyphicon glyphicon-log-in"></span> 注册</a></li>
+                    </ul>
+                    <!-- 使用Session -->
+                    <p class="navbar-text">
+                        您好!
+                        @{
+                            if (Session["username"] != null)
+                            {
+                                @Html.ActionLink(Session["username"].ToString(), "Admin", "Home", new { Id = TempData["Id"] }, new { @class = "navbar-link" });
+                            }
+                            else
+                            {
+                                @Html.ActionLink(" ", "Admin", "Home", new { @class = "navbar-link" });
+                            }
+                        }
+                    </p>
+                    @*<a href="~/Home/Admin" class="navbar-link">@if (Session["username"] != null){@Session["username"].ToString();}</a>*@
+                    <p class="navbar-text"><a href="~/Shared/Logout" class="navbar-link">退出</a></p>
+                </div>
+            </div>
+            <!-- 需要折叠的内容 -->
+        </div>
+    </nav>
+    <!--------------------------------- 导航结束 ------------------------------------->
+    <!--------------------------------- 内容 ------------------------------------->
+    @RenderBody()
+    <!--------------------------------- 内容 ------------------------------------->
+    <!--------------------------------- 页脚 ------------------------------------->
+    <div class="container-fluid" id="copyright">
+        <p style="margin-top:10px">2017@共享blogs  All Rights Reserved. </p>
+        <p> 工信部备案号： 川ICP备16002450号-1 </p>
+        <p> 联系方式：qq:847432003    邮箱：847432003@qq.com </p>
+    </div>
+    <!--------------------------------- 结束 ------------------------------------->
+</body>
+</html>

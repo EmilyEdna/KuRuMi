@@ -1,0 +1,394 @@
+﻿
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+
+<html lang="zh-hans">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link type="image/x-icon" rel="shortcut icon" href="~/Images/icon/title.ico" />
+    <meta charset="UTF-8">
+    <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+    <script src="~/Scripts/bootstrap.js"></script>
+    <script src="~/Scripts/fileinput.js"></script>
+    <script src="~/Scripts/locales/zh.js"></script>
+    <script src="~/Scripts/layer.js"></script>
+    <script src="~/Scripts/summernote/summernote.js"></script>
+    <script src="~/Scripts/locales/summernote-zh-CN.js"></script>
+    <script src="~/Scripts/jquery.datetimepicker.js"></script>
+    <script src="~/Scripts/Controls.js"></script>
+
+
+    <link href="~/Content/bootstrap.css" rel="stylesheet" />
+    <link href="~/Content/bootstrap-fileinput/css/fileinput.css" rel="stylesheet" />
+    <link href="~/Content/summernote.css" rel="stylesheet" />
+    <link href="~/Content/datetimepicker/jquery.datetimepicker.css" rel="stylesheet" />
+
+    <title>个人空间</title>
+    <style>
+        .panel-group {
+            max-height: 770px;
+            overflow: auto;
+        }
+
+        .left-menu {
+            margin: 10px;
+            margin-top: 5px;
+        }
+
+            .left-menu .panel-heading {
+                font-size: 14px;
+                padding-left: 20px;
+                height: 36px;
+                line-height: 36px;
+                color: white;
+                position: relative;
+                cursor: pointer;
+            }
+                /*转成手形图标*/
+                .left-menu .panel-heading span {
+                    position: absolute;
+                    right: 10px;
+                    top: 12px;
+                }
+
+            .left-menu .menu-item-left {
+                padding: 2px;
+                background: transparent;
+                border: 1px solid transparent;
+                border-radius: 6px;
+            }
+
+                .left-menu .menu-item-left:hover {
+                    background: #C4E3F3;
+                    border: 1px solid #1E90FF;
+                }
+    </style>
+    <script>
+        $(function () {       
+            $("#save").click(function () {
+                var obj = $("#userinfo").serializeObject();
+                obj.Id = localStorage.userinfo;
+                ctrl.ajaxWebApi({
+                    type: 'POST',             
+                    data: obj,
+                    url: "Api/User/Modify",
+                    cache: false,
+                    success: function (result) {
+                        ctrl.alert(result.content);
+                        setTimeout(clear(), 1000);
+                    }
+                });
+            });
+            $("#resave").click(function () {
+                $("#userinfo").find("input").val("");
+            });
+            ctrl.Initnav();
+            ctrl.fileinput("imgUpload", "/Home/FileInput");
+            ctrl.date("blog_date");
+            ctrl.date("atricle_date");
+            $("#saveBlogs").click(function () {
+                var obj = $("#blogContent").serializeObject();
+                obj.blogsId = localStorage.userinfo;
+                obj.content = $("#editor").summernote('code');
+                ctrl.ajaxController({
+                    url: '/Home/BlogsContent',
+                    type: 'post',
+                    data: obj,
+                    success: function (result) {
+                        ctrl.msg(result);
+                    }
+                });
+            });
+            $("#resaveBlogs").click(function () {
+                $("#blogContent").find("input").val("");
+                $("#editor").summernote('reset');
+            });
+            $("#saveAtricle").click(function () {
+                var obj = $("#atricleContent").serializeObject();
+                obj.atricleId = localStorage.userinfo;
+                obj.content = $("#atricle_editor").summernote('code');
+                ctrl.ajaxController({
+                    url: '/Home/AtricleContent',
+                    data: obj,
+                    type: 'post',
+                    success: function (result) {
+                        ctrl.msg(result);
+                    }
+                });
+            });
+            $("#resaveAtricle").click(function () {
+                $("#atricleContent").find("input").val("");
+                $("#atricle_editor").summernote('reset');
+            });
+        });
+        function clear() {
+            ctrl.ajaxController({
+                url: "@Url.Action("Logout", "Shared")",
+                data: null,
+                success: function () {
+                    window.location.reload();
+                }
+            });
+        }
+    </script>
+</head>
+<body>
+
+    <!--头部-->
+    <div class="navbar navbar-fixed-top navbar-inverse">
+        <h4 class="navbar-brand">@Session["username"]欢迎您进入个人空间！</h4>
+        <div class="navbar-right" style="margin-right:25px;margin-top:1%">
+            <p class="navbar-text"><a href="#" class="navbar-link" onclick="javascript:history.back(-1);"><span class="glyphicon glyphicon-backward"></span>返回</a></p>
+        </div>
+    </div>
+    <!--侧边导航-->
+    <div class="container-fluid" style="margin-top:70px;">
+        <div class="row">
+            <div class="col-md-2">
+                <!--响应式菜单开始-->
+                <div class="panel-group table-responsive" role="tablist">
+                    <!--一级组菜单-->
+                    <div class="panel left-menu panel-primary">
+                        <div class="panel-heading" id="group-one" data-target="#list-one" data-toggle="collapse">
+                            <h4 class="panel-title">
+                                用户资料<span class="glyphicon glyphicon-chevron-up right"></span>
+                            </h4>
+                        </div>
+                        <!--子菜单-->
+                        <!--panel-collapse collapse in 这里的in默认表示展开节点，去掉默认表示隐藏-->
+                        <div id="list-one" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="group-one">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <!-- 利用data-target指定URL -->
+                                    <button class="menu-item-left" id="user-config">
+                                        <span class="glyphicon glyphicon-user"></span>账户设置
+                                    </button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button class="menu-item-left" id="img-config">
+                                        <span class="glyphicon glyphicon-cog"></span>图片管理
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--结束-->
+                    </div>
+                    <!--二级组菜单-->
+                    <div class="panel left-menu panel-primary">
+                        <div class="panel-heading" id="group-two" data-target="#list-two" data-toggle="collapse">
+                            <h4 class="panel-title">
+                                博客管理
+                                <span class="glyphicon glyphicon-chevron-up right"></span>
+                            </h4>
+                        </div>
+                        <!--子菜单-->
+                        <div id="list-two" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="group-two">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <!-- 利用data-target指定URL -->
+                                    <button class="menu-item-left" id="blog-config">
+                                        <span class="glyphicon glyphicon-cog"></span>编辑
+                                    </button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button class="menu-item-left" id="role-config-one">
+                                        <span class="glyphicon glyphicon-cog"></span>权限
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--结束-->
+                    </div>
+                    <!--三级组菜单-->
+                    <div class="panel left-menu panel-primary">
+                        <div class="panel-heading" id="group-three" data-target="#list-three" data-toggle="collapse">
+                            <h4 class="panel-title">
+                                文章管理
+                                <span class="glyphicon glyphicon-chevron-up right"></span>
+                            </h4>
+                        </div>
+                        <!--子菜单-->
+                        <div id="list-three" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="group-three">
+                            <ul class="list-group">
+                                <li class="list-group-item">
+                                    <!-- 利用data-target指定URL -->
+                                    <button class="menu-item-left" id="atricle-config">
+                                        <span class="glyphicon glyphicon-cog"></span>编辑
+                                    </button>
+                                </li>
+                                <li class="list-group-item">
+                                    <button class="menu-item-left" id="role-config-two">
+                                        <span class="glyphicon glyphicon-cog"></span>权限
+                                    </button>
+                                </li>
+                            </ul>
+                        </div>
+                        <!--结束-->
+                    </div>
+                    <!--响应式菜单结束-->
+                </div>
+            </div>
+            <!--内容-->
+            <div class="col-md-10">
+                <!-- 用户 -->
+                <div id="user">
+                    <br />
+                    <form id="userinfo">           
+                        <!-- 用户名 -->
+                        <div class="row">
+                            <div class="col-md-2 col-xs-2 text-right" style="line-height:40px;">
+                                <span class="text-primary">您的用户名：</span>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                    <input type="text" class="form-control" placeholder="账号" id="userName" name="userName">
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback" style="display:inline-block;"></span> <!--小图标元素-->
+                                    <span style="display:inline-block;border:1px;width:30px;height:30px;position:absolute;right:2px;z-index:100;cursor: pointer;"></span> <!--覆盖在小图标上面的元素-->
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <div class="help-block"><text class="text-error" id="one"></text></div>
+                            </div>
+                        </div>
+                        <!-- 邮箱 -->
+                        <br />
+                        <div class="row">
+                            <div class="col-md-2 col-xs-2 text-right" style="line-height:40px;">
+                                <span class="text-primary">您的邮箱地址：</span>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span>
+                                    <input type="email" class="form-control" placeholder="邮箱" id="email" name="email">
+                                    <span class="glyphicon glyphicon-remove-circle form-control-feedback" style="display:inline-block;"></span> <!--小图标元素-->
+                                    <span style="display:inline-block;border:1px;width:30px;height:30px;position:absolute;right:2px;z-index:100;cursor: pointer;"></span> <!--覆盖在小图标上面的元素-->
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <div class="help-block"><text class="text-error" id="two"></text></div>
+                            </div>
+                        </div>
+                        <!-- 密码 -->
+                        <br />
+                        <div class="row">
+                            <div class="col-md-2 col-xs-2 text-right" style="line-height:40px;">
+                                <span class="text-primary">您的新密码：</span>
+                            </div>
+                            <div class="col-md-6 col-xs-6">
+                                <div class="input-group">
+                                    <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                    <input type="password" class="form-control" placeholder="密码" id="passWord" name="passWord">
+                                    <span class="glyphicon glyphicon-eye-open form-control-feedback" style="display:inline-block;"></span> <!--小图标元素-->
+                                    <span style="display:inline-block;border:1px;width:30px;height:30px;position:absolute;right:2px;z-index:100;cursor: pointer;"></span> <!--覆盖在小图标上面的元素-->
+                                </div>
+                            </div>
+                            <div class="col-md-4 col-xs-4">
+                                <div class="help-block"><text class="text-error" id="three"></text></div>
+                            </div>
+                        </div>
+                        <!-- 提交按钮 -->
+                    </form>
+                    <br />
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6 text-center">
+                            <button class="form-control-static glyphicon glyphicon-save btn btn-sm btn-primary" id="save">保存</button>
+                        </div>
+                        <div class="col-md-6 col-xs-6 text-left">
+                            <button class="form-control-static glyphicon glyphicon-share-alt btn btn-sm btn-primary" id="resave">撤销</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 图片 -->
+                <div id="img" style="display:none">
+                    <br />
+                    <!-- 图片上传 -->
+                    <div class="row">
+                        <div class="col-md-12 col-xs-12">
+                            <input type="file" id="imgUpload" multiple class="file-loading" />
+                        </div>
+                    </div>
+                </div>
+                <!-- 博客 -->
+                <div id="blog" style="display:none">
+                    <form id="blogContent">
+                        <!-- 博客头 -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="label label-info">标题</label>
+                                <input class="form-control" type="text" placeholder="请在此处输入博客标题"  name="title"/>
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label label-info">标签</label>
+                                <input class="form-control" type="text" placeholder="请在此处输入标签" name="tips" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label label-info">分类</label>
+                                <input class="form-control" type="text" placeholder="请在此处输入分类" name="category" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label label-info">时间</label>
+                                <input class="form-control" type="datetime" id="blog_date"  name="date"/>
+                            </div>
+                        </div>
+                        <br />
+                        <!-- 文本编辑器 -->
+                        <div id="editor" class="summernote" name="content"></div>
+                    </form>
+                    <!-- 提交 -->
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6 text-right">
+                            <button class="form-control-static glyphicon glyphicon-save btn btn-sm btn-primary" id="saveBlogs">保存</button>
+                        </div>
+                        <div class="col-md-6 col-xs-6 text-left">
+                            <button class="form-control-static glyphicon glyphicon-share-alt btn btn-sm btn-primary" id="resaveBlogs">撤销</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- 文章 -->
+                <div id="atricle" style="display:none">
+                    <form id="atricleContent">
+                        <!-- 文章头 -->
+                        <div class="row">
+                            <div class="col-md-3">
+                                <label class="label label-info">标题</label>
+                                <input class="form-control" type="text" placeholder="请在此处输入博客标题" name="title" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label label-info">标签</label>
+                                <input class="form-control" type="text" placeholder="请在此处输入标签" name="tips" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label label-info">分类</label>
+                                <input class="form-control" type="text" placeholder="请在此处输入分类" name="category" />
+                            </div>
+                            <div class="col-md-3">
+                                <label class="label label-info">时间</label>
+                                <input class="form-control" type="datetime" id="atricle_date" name="date"/>
+                            </div>
+                        </div>
+                        <br />
+                        <!-- 文本编辑器 -->
+                        <div id="atricle_editor" class="summernote"></div>
+                    </form>
+                    <!-- 提交 -->
+                    <div class="row">
+                        <div class="col-md-6 col-xs-6 text-right">
+                            <button class="form-control-static glyphicon glyphicon-save btn btn-sm btn-primary" id="saveAtricle">保存</button>
+                        </div>
+                        <div class="col-md-6 col-xs-6 text-left">
+                            <button class="form-control-static glyphicon glyphicon-share-alt btn btn-sm btn-primary" id="resaveAtricle">撤销</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="role" style="display:none">role</div>
+            </div>
+        </div>
+    </div>
+    <!--页脚-->
+</body>
+</html>
+
